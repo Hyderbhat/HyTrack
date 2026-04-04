@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hunyadi: #E09F3E;
+  --color-hunyadi-light: #f0b85a;
+  --color-hunyadi-dark: #c4872a;
+  --color-auburn: #9E2A2B;
+  --color-auburn-light: #c43536;
+  --color-auburn-dark: #7a1f20;
+  --color-slate-dark: #335C67;
+  --color-slate-mid: #2a4d57;
+  --color-slate-deeper: #1e3a42;
+  --color-vanilla: #FFF3B0;
+  --color-vanilla-dark: #f5e87a;
+  --font-sans: 'Poppins', 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-family: var(--font-sans); scroll-behavior: smooth; }
+
+  body {
+    background: #0f1e24;
+    color: #e8f4f8;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  #root { min-height: 100dvh; }
+}
+
+@layer utilities {
+  /* Glass morphism */
+  .glass {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .glass-strong {
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* Neumorphism on dark */
+  .neu {
+    background: #162830;
+    box-shadow: 6px 6px 12px #0b191e, -6px -6px 12px #1f3a46;
+  }
+  .neu-sm {
+    background: #162830;
+    box-shadow: 3px 3px 8px #0b191e, -3px -3px 8px #1f3a46;
+  }
+
+  /* Gradient backgrounds */
+  .grad-balance {
+    background: linear-gradient(135deg, #1e3a42 0%, #335c67 45%, #2a4d57 100%);
+  }
+  .grad-income {
+    background: linear-gradient(135deg, #1e3a1e 0%, #2d5e2d 100%);
+  }
+  .grad-expense {
+    background: linear-gradient(135deg, #3a1e1e 0%, #5e2d2d 100%);
+  }
+  .grad-accent {
+    background: linear-gradient(135deg, #c4872a 0%, #E09F3E 60%, #f0b85a 100%);
+  }
+  .grad-purple {
+    background: linear-gradient(135deg, #2d1b69 0%, #4a2d8a 50%, #6b46c1 100%);
+  }
+
+  /* Scrollbar */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Smooth transitions */
+  .transition-all-smooth { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+  /* Text gradient */
+  .text-grad-gold {
+    background: linear-gradient(135deg, #E09F3E, #f0b85a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-grad-white {
+    background: linear-gradient(135deg, #ffffff, #b0c8d0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Card hover */
+  .card-hover {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  }
+
+  /* Pulse ring */
+  .pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+
+  /* Bottom nav safe area */
+  .pb-safe { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224,159,62,0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(224,159,62,0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-fade-in  { animation: fadeIn  0.35s ease forwards; }
+.animate-count-up { animation: countUp 0.5s ease forwards; }
+
+/* Shimmer skeleton */
+.shimmer {
+  background: linear-gradient(90deg, #1e3a42 25%, #243d45 50%, #1e3a42 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
