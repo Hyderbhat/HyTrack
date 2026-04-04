@@ -15,31 +15,10 @@ function getDbConfig(database) {
   };
 }
 
-async function ensureDatabaseExists() {
-  const targetDatabase = process.env.DB_NAME || 'hyTrack';
-  const adminClient = new Client(getDbConfig(process.env.DB_ADMIN_DB || 'postgres'));
-
-  await adminClient.connect();
-
-  try {
-    const existing = await adminClient.query(
-      'SELECT 1 FROM pg_database WHERE datname = $1',
-      [targetDatabase]
-    );
-
-    if (existing.rowCount === 0) {
-      await adminClient.query(`CREATE DATABASE "${targetDatabase.replace(/"/g, '""')}"`);
-      console.log(`Created database "${targetDatabase}"`);
-    }
-  } finally {
-    await adminClient.end();
-  }
-}
 
 async function initDatabase() {
   if (!initPromise) {
     initPromise = (async () => {
-      await ensureDatabaseExists();
 
       const pool = require('./pool');
       const schemaPath = path.join(__dirname, 'schema.sql');

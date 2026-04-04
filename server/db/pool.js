@@ -1,20 +1,29 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
-  host:     process.env.DB_HOST     || 'localhost',
-  port:     Number(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME     || 'hyTrack',
-  user:     process.env.DB_USER     || 'postgres',
-  password: process.env.DB_PASSWORD || '',
-});
+const connectionString = process.env.DATABASE_URL || process.env.DB_URL;
+
+const useSsl =
+  process.env.DB_SSL === 'true' ||
+  (typeof connectionString === 'string' &&
+    (/supabase\.co/i.test(connectionString) || /sslmode=require/i.test(connectionString)));
+
+const poolConfig = {
+  connectionString,
+};
+
+if (useSsl) {
+  poolConfig.ssl = { rejectUnauthorized: false };
+}
+
+const pool = new Pool(poolConfig);
 
 pool.on('connect', () => {
-  console.log('✅  Connected to PostgreSQL (hyTrack)');
+  console.log('✅ Connected to PostgreSQL');
 });
 
 pool.on('error', (err) => {
-  console.error('❌  Unexpected DB error:', err.message);
+  console.error('❌ DB error:', err.message);
 });
 
 module.exports = pool;
