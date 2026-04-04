@@ -14,7 +14,10 @@ const personalityRouter = require('./routes/personality');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
