@@ -66,11 +66,11 @@ async function signup(req, res) {
       ? await User.updateProfile(user.id, {
           name: user.name,
           budget: user.budget,
+          currency: user.currency,
           avatarUrl: await saveAvatar({ userId: user.id, avatarDataUrl: avatarUrl, currentAvatarUrl: user.avatar_url }),
         })
       : user;
 
-          currency: user.currency,
     return res.status(201).json(await createSession(publicUser));
   } catch (error) {
     console.error('signup error:', error.message);
