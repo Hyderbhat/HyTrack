@@ -22,6 +22,7 @@ const getTransactions = async (req, res) => {
 const createTransaction = async (req, res) => {
   try {
     const { type, amount, category, note, date } = req.body;
+    const parsedAmount = Number(amount);
 
     if (!type || !amount || !category) {
       return res.status(400).json({ error: 'type, amount and category are required' });
@@ -29,14 +30,14 @@ const createTransaction = async (req, res) => {
     if (!['income', 'expense'].includes(type)) {
       return res.status(400).json({ error: 'type must be income or expense' });
     }
-    if (Number(amount) <= 0) {
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       return res.status(400).json({ error: 'amount must be positive' });
     }
 
     const transaction = await Transaction.create({
       user_id: req.user.id,
       type,
-      amount,
+      amount: parsedAmount,
       category,
       note,
       date,

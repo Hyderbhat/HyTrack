@@ -42,9 +42,14 @@ export const DUMMY_TRANSACTIONS = [
 export const getCategoryMeta = (id) =>
   CATEGORIES.find((c) => c.id === id) || CATEGORIES[CATEGORIES.length - 1];
 
+const toSafeAmount = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 export const computeStats = (transactions = DUMMY_TRANSACTIONS) => {
-  const income  = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const expense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const income  = transactions.filter(t => t.type === 'income').reduce((s, t) => s + toSafeAmount(t.amount), 0);
+  const expense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + toSafeAmount(t.amount), 0);
   const balance = income - expense;
   const savingsRate = income > 0 ? ((income - expense) / income) * 100 : 0;
   return { income, expense, balance, savingsRate };

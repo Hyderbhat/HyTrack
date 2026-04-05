@@ -1,10 +1,11 @@
 export const formatCurrency = (amount, currency = 'INR') => {
+  const safeAmount = Number.isFinite(Number(amount)) ? Number(amount) : 0;
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(safeAmount);
 };
 
 export const formatDate = (dateStr) => {
@@ -52,7 +53,8 @@ export const summarizeByCategory = (transactions) => {
   transactions
     .filter((t) => t.type === 'expense')
     .forEach((t) => {
-      map[t.category] = (map[t.category] || 0) + t.amount;
+      const amount = Number(t.amount);
+      map[t.category] = (map[t.category] || 0) + (Number.isFinite(amount) ? amount : 0);
     });
   return Object.entries(map)
     .map(([id, value]) => ({ id, value }))

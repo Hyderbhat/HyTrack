@@ -2,6 +2,14 @@ const pool = require('../db/pool');
 
 const DEFAULT_LIMIT = 100;
 
+function normalizeTransaction(row) {
+  const amount = Number(row.amount);
+  return {
+    ...row,
+    amount: Number.isFinite(amount) ? amount : 0,
+  };
+}
+
 const Transaction = {
   /**
    * Find all transactions for a user with optional filters.
@@ -30,7 +38,7 @@ const Transaction = {
     params.push(limit);
 
     const { rows } = await pool.query(query, params);
-    return rows;
+    return rows.map(normalizeTransaction);
   },
 
   /**
@@ -52,7 +60,7 @@ const Transaction = {
       ]
     );
 
-    return rows[0];
+    return normalizeTransaction(rows[0]);
   },
 
   /**
