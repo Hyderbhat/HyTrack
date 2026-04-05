@@ -20,14 +20,3 @@ export function resolveAssetUrl(url) {
 
   return `${API_ORIGIN}/${url.replace(/^\/+/, "")}`;
 }
-
-export function resolveAssetUrl(url) {
-  if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-    return url;
-  }
-  if (url.startsWith('/')) {
-    return `${API_ORIGIN}${url}`;
-  }
-  return `${API_ORIGIN}/${url}`;
-}
