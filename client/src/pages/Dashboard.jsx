@@ -6,8 +6,11 @@ import TransactionList from '../components/TransactionList.jsx';
 import DonutChart from '../components/DonutChart.jsx';
 import InsightCard from '../components/InsightCard.jsx';
 import AlertCard from '../components/AlertCard.jsx';
+import { formatCurrency } from '../utils/formatters.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
 export default function Dashboard({ user, transactions, stats, categoryBreakdown, insights, alerts, onOpenProfile }) {
+  const { currency } = useCurrency();
   return (
     <div className="min-h-screen pb-safe">
       <Header showAvatar user={user} alerts={alerts} onOpenProfile={onOpenProfile} />
@@ -17,7 +20,7 @@ export default function Dashboard({ user, transactions, stats, categoryBreakdown
 
         <div className="grid grid-cols-2 gap-3">
           <QuickStat label="This Month" value={`${transactions.filter((t) => t.type === 'expense').length} expenses`} icon="Stats" />
-          <QuickStat label="Avg/Day" value={`INR ${Math.round(stats.expense / 30).toLocaleString('en-IN')}`} icon="Daily" />
+          <QuickStat label="Avg/Day" value={formatCurrency(Math.round(stats.expense / 30), currency)} icon="Daily" />
         </div>
 
         <Section title="Spending Breakdown" icon="Breakdown" link="/insights">

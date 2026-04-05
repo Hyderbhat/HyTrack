@@ -21,6 +21,7 @@ const Session = {
          u.name,
          u.email,
          u.budget,
+         u.currency,
          u.avatar_url,
          u.created_at
        FROM auth_sessions s

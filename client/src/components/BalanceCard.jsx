@@ -1,7 +1,9 @@
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { formatCurrency, formatPercent } from '../utils/formatters.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
 export default function BalanceCard({ stats }) {
+  const { currency } = useCurrency();
   const { balance, income, expense, savingsRate } = stats;
   const isPositive = balance >= 0;
 
@@ -34,7 +36,7 @@ export default function BalanceCard({ stats }) {
               className="text-4xl font-bold tracking-tight"
               style={{ color: isPositive ? '#FFF3B0' : '#9E2A2B' }}
             >
-              {formatCurrency(balance)}
+              {formatCurrency(balance, currency)}
             </h2>
           </div>
           <p className="text-xs mt-1 opacity-50">
@@ -57,6 +59,7 @@ export default function BalanceCard({ stats }) {
         <StatPill
           label="Income"
           value={income}
+          currency={currency}
           Icon={TrendingUp}
           color="#4ade80"
           bg="rgba(74,222,128,0.12)"
@@ -65,6 +68,7 @@ export default function BalanceCard({ stats }) {
         <StatPill
           label="Expenses"
           value={expense}
+          currency={currency}
           Icon={TrendingDown}
           color="#f87171"
           bg="rgba(248,113,113,0.12)"
@@ -81,7 +85,7 @@ export default function BalanceCard({ stats }) {
   );
 }
 
-function StatPill({ label, value, Icon, color, bg, border }) {
+function StatPill({ label, value, currency, Icon, color, bg, border }) {
   return (
     <div
       className="flex items-center gap-2 p-3 rounded-2xl"
@@ -91,7 +95,7 @@ function StatPill({ label, value, Icon, color, bg, border }) {
       <div>
         <p className="text-xs opacity-60">{label}</p>
         <p className="text-sm font-semibold" style={{ color }}>
-          {formatCurrency(value)}
+          {formatCurrency(value, currency)}
         </p>
       </div>
     </div>

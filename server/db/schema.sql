@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   email                  TEXT UNIQUE NOT NULL,
   password_hash          TEXT,
   budget                 NUMERIC(12, 2) DEFAULT 50000,
+  currency               TEXT NOT NULL DEFAULT 'INR',
   avatar_url             TEXT,
   reset_token_hash       TEXT,
   reset_token_expires_at TIMESTAMPTZ,
@@ -18,8 +19,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'INR';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_hash TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires_at TIMESTAMPTZ;
+UPDATE users SET currency = 'INR' WHERE currency IS NULL OR currency = '';
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_lower ON users (LOWER(email));
 
 CREATE TABLE IF NOT EXISTS auth_sessions (

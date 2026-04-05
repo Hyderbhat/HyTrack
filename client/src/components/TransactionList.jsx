@@ -1,7 +1,9 @@
 import { getCategoryMeta } from '../utils/dummyData.js';
 import { formatCurrency, getRelativeTime, groupByDate } from '../utils/formatters.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
 export default function TransactionList({ transactions, limit }) {
+  const { currency } = useCurrency();
   const displayed = limit ? transactions.slice(0, limit) : transactions;
   const grouped   = groupByDate(displayed);
 
@@ -23,7 +25,7 @@ export default function TransactionList({ transactions, limit }) {
           </p>
           <div className="space-y-2">
             {txs.map((tx) => (
-              <TransactionRow key={tx.id} tx={tx} />
+              <TransactionRow key={tx.id} tx={tx} currency={currency} />
             ))}
           </div>
         </div>
@@ -32,7 +34,7 @@ export default function TransactionList({ transactions, limit }) {
   );
 }
 
-function TransactionRow({ tx }) {
+function TransactionRow({ tx, currency }) {
   const cat = getCategoryMeta(tx.category);
   const isIncome = tx.type === 'income';
 
@@ -72,7 +74,7 @@ function TransactionRow({ tx }) {
           className="text-sm font-bold"
           style={{ color: isIncome ? '#4ade80' : '#f87171' }}
         >
-          {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
+          {isIncome ? '+' : '-'}{formatCurrency(tx.amount, currency)}
         </p>
       </div>
     </div>

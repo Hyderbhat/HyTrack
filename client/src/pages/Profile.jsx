@@ -7,6 +7,7 @@ import Header from '../components/Header.jsx';
 import PersonalityCard from '../components/PersonalityCard.jsx';
 import { formatCurrency } from '../utils/formatters.js';
 import { resolveAssetUrl } from '../utils/assets.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
 const SETTINGS = [
   { icon: Bell, label: 'Notifications', desc: 'Alerts & reminders' },
@@ -16,9 +17,10 @@ const SETTINGS = [
 ];
 
 export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertRead, onMarkAllAlertsRead, stats, personality, onSignOut, onUpdateProfile, onChangePassword }) {
+  const { currency, setCurrency, currencyOptions } = useCurrency();
   const fileInputRef = useRef(null);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: user?.name || '', budget: String(user?.budget || 0), avatarUrl: user?.avatar_url || '' });
+  const [form, setForm] = useState({ name: user?.name || '', budget: String(user?.budget || 0), currency: user?.currency || currency, avatarUrl: user?.avatar_url || '' });
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '' });
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -30,8 +32,8 @@ export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertR
   const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
-    setForm({ name: user?.name || '', budget: String(user?.budget || 0), avatarUrl: user?.avatar_url || '' });
-  }, [user?.avatar_url, user?.budget, user?.name]);
+    setForm({ name: user?.name || '', budget: String(user?.budget || 0), currency: user?.currency || currency, avatarUrl: user?.avatar_url || '' });
+  }, [currency, user?.avatar_url, user?.budget, user?.currency, user?.name]);
 
   const joinedLabel = user?.created_at ? new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(new Date(user.created_at)) : 'Recently';
   const currentBudget = Number(user?.budget || 0);
@@ -63,7 +65,8 @@ export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertR
 
     setSaving(true);
     try {
-      await onUpdateProfile({ name: form.name.trim(), budget: parsedBudget, avatarUrl: form.avatarUrl });
+      await onUpdateProfile({ name: form.name.trim(), budget: parsedBudget, currency: form.currency, avatarUrl: form.avatarUrl });
+      setCurrency(form.currency);
       setMessage('Profile updated successfully');
       setEditing(false);
     } catch (saveError) {
@@ -114,15 +117,15 @@ export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertR
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <StatCard label="Balance" value={formatCurrency(stats.balance)} color="#FFF3B0" />
-          <StatCard label="Income" value={formatCurrency(stats.income)} color="#4ade80" />
-          <StatCard label="Expense" value={formatCurrency(stats.expense)} color="#f87171" />
+          <StatCard label="Balance" value={formatCurrency(stats.balance, currency)} color="#FFF3B0" />
+          <StatCard label="Income" value={formatCurrency(stats.income, currency)} color="#4ade80" />
+          <StatCard label="Expense" value={formatCurrency(stats.expense, currency)} color="#f87171" />
         </div>
 
         <div className="rounded-3xl p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div className="flex items-center justify-between mb-4"><div className="flex items-center gap-2"><Target size={16} style={{ color: '#E09F3E' }} /><h3 className="text-sm font-semibold text-white">Monthly Budget</h3></div><span className="text-xs font-bold" style={{ color: '#E09F3E' }}>{formatCurrency(currentBudget)}</span></div>
+          <div className="flex items-center justify-between mb-4"><div className="flex items-center gap-2"><Target size={16} style={{ color: '#E09F3E' }} /><h3 className="text-sm font-semibold text-white">Monthly Budget</h3></div><span className="text-xs font-bold" style={{ color: '#E09F3E' }}>{formatCurrency(currentBudget, currency)}</span></div>
           <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}><div className="h-full rounded-full" style={{ width: `${Math.min(100, (stats.expense / Math.max(currentBudget || 1, 1)) * 100)}%`, background: stats.expense > currentBudget ? 'linear-gradient(90deg, #9E2A2B, #c43536)' : 'linear-gradient(90deg, #c4872a, #E09F3E)', transition: 'width 1s ease' }} /></div>
-          <div className="flex justify-between mt-2"><p className="text-xs opacity-40">Spent: {formatCurrency(stats.expense)}</p><p className="text-xs font-medium" style={{ color: stats.expense > currentBudget ? '#f87171' : 'rgba(255,255,255,0.4)' }}>{stats.expense > currentBudget ? 'Over budget!' : `${formatCurrency(currentBudget - stats.expense)} left`}</p></div>
+          <div className="flex justify-between mt-2"><p className="text-xs opacity-40">Spent: {formatCurrency(stats.expense, currency)}</p><p className="text-xs font-medium" style={{ color: stats.expense > currentBudget ? '#f87171' : 'rgba(255,255,255,0.4)' }}>{stats.expense > currentBudget ? 'Over budget!' : `${formatCurrency(currentBudget - stats.expense, currency)} left`}</p></div>
         </div>
 
         <PersonalityCard type={personality} />
@@ -133,6 +136,7 @@ export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertR
             <Field icon={User} label="Name" value={form.name} disabled={!editing || saving} onChange={(value) => setForm((prev) => ({ ...prev, name: value }))} />
             <Field icon={Mail} label="Email" value={user?.email || ''} disabled />
             <Field icon={Target} label="Monthly budget" type="number" value={form.budget} disabled={!editing || saving} onChange={(value) => setForm((prev) => ({ ...prev, budget: value }))} />
+            <SelectField icon={Target} label="Currency" value={form.currency} disabled={!editing || saving} options={currencyOptions} onChange={(value) => { setForm((prev) => ({ ...prev, currency: value })); setCurrency(value); }} />
             <Field icon={ImagePlus} label="Avatar image URL" value={form.avatarUrl} disabled={!editing || saving} onChange={(value) => setForm((prev) => ({ ...prev, avatarUrl: value }))} placeholder="Paste an image URL or upload above" />
           </div>
           {message && <p className="text-xs mt-4" style={{ color: '#86efac' }}>{message}</p>}
@@ -173,6 +177,10 @@ function StatCard({ label, value, color }) {
 
 function Field({ icon: Icon, onChange = () => {}, disabled = false, label, ...props }) {
   return <label className="block"><span className="text-xs uppercase tracking-wide opacity-40">{label}</span><div className="relative mt-2"><Icon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40" /><input {...props} disabled={disabled} onChange={(event) => onChange(event.target.value)} className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm text-white outline-none disabled:opacity-60" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }} /></div></label>;
+}
+
+function SelectField({ icon: Icon, onChange = () => {}, disabled = false, label, value, options = [] }) {
+  return <label className="block"><span className="text-xs uppercase tracking-wide opacity-40">{label}</span><div className="relative mt-2"><Icon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none" /><select value={value} disabled={disabled} onChange={(event) => onChange(event.target.value)} className="w-full pl-10 pr-4 py-3 rounded-2xl text-sm text-white outline-none disabled:opacity-60" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>{options.map((item) => <option key={item.code} value={item.code} style={{ background: '#1a3340' }}>{item.label}</option>)}</select></div></label>;
 }
 
 function PasswordField({ icon: Icon, onChange = () => {}, label, visible, onToggle, ...props }) {

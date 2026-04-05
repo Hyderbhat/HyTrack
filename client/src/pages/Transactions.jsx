@@ -4,6 +4,7 @@ import Header from '../components/Header.jsx';
 import TransactionList from '../components/TransactionList.jsx';
 import { CATEGORIES } from '../../../shared/constants.js';
 import { formatCurrency } from '../utils/formatters.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
 const TYPE_FILTERS = [
   { value: 'all', label: 'All' },
@@ -12,6 +13,7 @@ const TYPE_FILTERS = [
 ];
 
 export default function Transactions({ user, alerts, onOpenProfile, filtered, filter, setFilter, search, setSearch, stats }) {
+  const { currency } = useCurrency();
   const [showCatFilter, setShowCatFilter] = useState(false);
 
   return (
@@ -20,8 +22,8 @@ export default function Transactions({ user, alerts, onOpenProfile, filtered, fi
 
       <main className="px-4 pb-6 space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <SummaryPill label="Total Income" amount={stats.income} color="#4ade80" bg="rgba(74,222,128,0.08)" />
-          <SummaryPill label="Total Expense" amount={stats.expense} color="#f87171" bg="rgba(248,113,113,0.08)" />
+          <SummaryPill label="Total Income" amount={stats.income} currency={currency} color="#4ade80" bg="rgba(74,222,128,0.08)" />
+          <SummaryPill label="Total Expense" amount={stats.expense} currency={currency} color="#f87171" bg="rgba(248,113,113,0.08)" />
         </div>
 
         <div className="relative">
@@ -81,11 +83,11 @@ export default function Transactions({ user, alerts, onOpenProfile, filtered, fi
   );
 }
 
-function SummaryPill({ label, amount, color, bg }) {
+function SummaryPill({ label, amount, currency, color, bg }) {
   return (
     <div className="p-4 rounded-2xl" style={{ background: bg, border: `1px solid ${color}20` }}>
       <p className="text-xs opacity-50">{label}</p>
-      <p className="text-base font-bold mt-1" style={{ color }}>{formatCurrency(amount)}</p>
+      <p className="text-base font-bold mt-1" style={{ color }}>{formatCurrency(amount, currency)}</p>
     </div>
   );
 }

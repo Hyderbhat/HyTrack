@@ -5,6 +5,7 @@ const PUBLIC_USER_COLUMNS = `
   name,
   email,
   budget,
+  currency,
   avatar_url,
   created_at
 `;
@@ -17,6 +18,7 @@ function toPublicUser(user) {
     name: user.name,
     email: user.email,
     budget: Number(user.budget) || 0,
+    currency: user.currency || 'INR',
     avatar_url: user.avatar_url || '',
     created_at: user.created_at,
   };
@@ -41,26 +43,27 @@ const User = {
     return rows[0] || null;
   },
 
-  async create({ name, email, passwordHash, budget = 50000, avatarUrl = '' }) {
+  async create({ name, email, passwordHash, budget = 50000, currency = 'INR', avatarUrl = '' }) {
     const { rows } = await pool.query(
-      `INSERT INTO users (name, email, password_hash, budget, avatar_url)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (name, email, password_hash, budget, currency, avatar_url)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [name, email.toLowerCase(), passwordHash, Number(budget), avatarUrl]
+      [name, email.toLowerCase(), passwordHash, Number(budget), currency, avatarUrl]
     );
 
     return rows[0];
   },
 
-  async updateProfile(id, { name, budget, avatarUrl }) {
+  async updateProfile(id, { name, budget, currency = 'INR', avatarUrl }) {
     const { rows } = await pool.query(
       `UPDATE users
        SET name = $2,
            budget = $3,
-           avatar_url = $4
+           currency = $4,
+           avatar_url = $5
        WHERE id = $1
        RETURNING ${PUBLIC_USER_COLUMNS}`,
-      [id, name.trim(), Number(budget), avatarUrl || '']
+      [id, name.trim(), Number(budget), currency, avatarUrl || '']
     );
 
     return rows[0] || null;

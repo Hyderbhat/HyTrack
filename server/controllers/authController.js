@@ -5,6 +5,12 @@ const { generateSessionToken, hashToken, buildSessionExpiry } = require('../util
 const { toPublicUser } = require('../models/User');
 const { saveAvatar } = require('../services/avatarStorage');
 
+const ALLOWED_CURRENCIES = new Set(['INR', 'USD', 'EUR', 'GBP', 'AED']);
+
+function normalizeCurrency(value) {
+  return ALLOWED_CURRENCIES.has(value) ? value : 'INR';
+}
+
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -29,7 +35,7 @@ async function createSession(user) {
 
 async function signup(req, res) {
   try {
-    const { name, email, password, budget, avatarUrl } = req.body;
+    const { name, email, password, budget, currency, avatarUrl } = req.body;
     if (!name?.trim() || !email?.trim() || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
@@ -52,6 +58,7 @@ async function signup(req, res) {
       email: email.trim(),
       passwordHash,
       budget: parsedBudget || 50000,
+      currency: normalizeCurrency(currency),
       avatarUrl: avatarUrl || '',
     });
 
@@ -63,6 +70,7 @@ async function signup(req, res) {
         })
       : user;
 
+          currency: user.currency,
     return res.status(201).json(await createSession(publicUser));
   } catch (error) {
     console.error('signup error:', error.message);
@@ -94,7 +102,7 @@ async function me(req, res) {
 
 async function updateMe(req, res) {
   try {
-    const { name, budget, avatarUrl } = req.body;
+    const { name, budget, currency, avatarUrl } = req.body;
     if (!name?.trim()) return res.status(400).json({ error: 'Name is required' });
 
     const parsedBudget = Number(budget);
@@ -111,6 +119,7 @@ async function updateMe(req, res) {
     const user = await User.updateProfile(req.user.id, {
       name,
       budget: parsedBudget,
+      currency: normalizeCurrency(currency || req.user.currency),
       avatarUrl: storedAvatarUrl,
     });
 

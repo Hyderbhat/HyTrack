@@ -7,18 +7,20 @@ import InsightCard from '../components/InsightCard.jsx';
 import AlertCard from '../components/AlertCard.jsx';
 import PersonalityCard from '../components/PersonalityCard.jsx';
 import { formatCurrency, formatPercent } from '../utils/formatters.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, currency }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="px-3 py-2 rounded-xl text-xs" style={{ background: 'rgba(26,46,56,0.95)', border: '1px solid rgba(255,255,255,0.15)' }}>
       <p className="font-semibold mb-1 opacity-60">{label}</p>
-      {payload.map((entry) => <p key={entry.dataKey} style={{ color: entry.color }}>{entry.dataKey === 'income' ? 'Income' : 'Expense'}: {formatCurrency(entry.value)}</p>)}
+      {payload.map((entry) => <p key={entry.dataKey} style={{ color: entry.color }}>{entry.dataKey === 'income' ? 'Income' : 'Expense'}: {formatCurrency(entry.value, currency)}</p>)}
     </div>
   );
 };
 
 export default function Insights({ user, alerts, onOpenProfile, insights, weeklyChange, weeklyData, stats, personality }) {
+  const { currency } = useCurrency();
   const isUp = weeklyChange.pct > 0;
 
   return (
@@ -30,7 +32,7 @@ export default function Insights({ user, alerts, onOpenProfile, insights, weekly
           <span className="text-xs uppercase tracking-wide opacity-60">Weekly</span>
           <div>
             <p className="text-sm font-semibold text-white">{isUp ? 'Spending Up' : 'Spending Down'} {formatPercent(weeklyChange.pct)} this week</p>
-            <p className="text-xs opacity-50 mt-0.5">This week: {formatCurrency(weeklyChange.thisWeek)} vs last week: {formatCurrency(weeklyChange.lastWeek)}</p>
+            <p className="text-xs opacity-50 mt-0.5">This week: {formatCurrency(weeklyChange.thisWeek, currency)} vs last week: {formatCurrency(weeklyChange.lastWeek, currency)}</p>
           </div>
         </div>
 
@@ -41,7 +43,7 @@ export default function Insights({ user, alerts, onOpenProfile, insights, weekly
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="day" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis hide />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+                <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
                 <Bar dataKey="income" fill="#27ae60" radius={[6, 6, 0, 0]} maxBarSize={20} />
                 <Bar dataKey="expense" fill="#E09F3E" radius={[6, 6, 0, 0]} maxBarSize={20} />
               </BarChart>

@@ -1,8 +1,9 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { CATEGORIES, CHART_COLORS } from '../../../shared/constants.js';
 import { formatCurrency } from '../utils/formatters.js';
+import { useCurrency } from '../context/CurrencyContext.jsx';
 
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, currency }) => {
   if (!active || !payload?.length) return null;
   const { name, value } = payload[0];
   return (
@@ -15,12 +16,13 @@ const CustomTooltip = ({ active, payload }) => {
       }}
     >
       <p className="font-semibold" style={{ color: '#E09F3E' }}>{name}</p>
-      <p className="text-white">{formatCurrency(value)}</p>
+      <p className="text-white">{formatCurrency(value, currency)}</p>
     </div>
   );
 };
 
 export default function DonutChart({ data }) {
+  const { currency } = useCurrency();
   const chartData = data.map((item) => {
     const cat = CATEGORIES.find((c) => c.id === item.id);
     return {
@@ -53,7 +55,7 @@ export default function DonutChart({ data }) {
                 <Cell key={`cell-${index}`} fill={entry.color} opacity={0.9} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip currency={currency} />} />
           </PieChart>
         </ResponsiveContainer>
 
@@ -61,7 +63,7 @@ export default function DonutChart({ data }) {
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <p className="text-xs opacity-40">Total spend</p>
           <p className="text-base font-bold" style={{ color: '#FFF3B0' }}>
-            {formatCurrency(total)}
+            {formatCurrency(total, currency)}
           </p>
         </div>
       </div>
