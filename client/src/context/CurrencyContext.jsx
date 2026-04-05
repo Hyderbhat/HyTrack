@@ -32,11 +32,11 @@ export function CurrencyProvider({ children }) {
 
   useEffect(() => {
     const serverCurrency = user?.currency;
-    if (ALLOWED.has(serverCurrency) && serverCurrency !== currency) {
+    if (ALLOWED.has(serverCurrency)) {
       setCurrencyState(serverCurrency);
       localStorage.setItem(STORAGE_KEY, serverCurrency);
     }
-  }, [currency, user?.currency]);
+  }, [user?.id, user?.currency]);
 
   const value = useMemo(
     () => ({ currency, setCurrency, currencyOptions: CURRENCY_OPTIONS }),
