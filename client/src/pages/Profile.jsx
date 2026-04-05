@@ -32,8 +32,9 @@ export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertR
   const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
+    if (editing) return;
     setForm({ name: user?.name || '', budget: String(user?.budget || 0), currency: user?.currency || currency, avatarUrl: user?.avatar_url || '' });
-  }, [currency, user?.avatar_url, user?.budget, user?.currency, user?.name]);
+  }, [editing, user?.avatar_url, user?.budget, user?.currency, user?.name]);
 
   const joinedLabel = user?.created_at ? new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(new Date(user.created_at)) : 'Recently';
   const currentBudget = Number(user?.budget || 0);
@@ -136,7 +137,7 @@ export default function Profile({ user, alerts = [], onOpenProfile, onMarkAlertR
             <Field icon={User} label="Name" value={form.name} disabled={!editing || saving} onChange={(value) => setForm((prev) => ({ ...prev, name: value }))} />
             <Field icon={Mail} label="Email" value={user?.email || ''} disabled />
             <Field icon={Target} label="Monthly budget" type="number" value={form.budget} disabled={!editing || saving} onChange={(value) => setForm((prev) => ({ ...prev, budget: value }))} />
-            <SelectField icon={Target} label="Currency" value={form.currency} disabled={!editing || saving} options={currencyOptions} onChange={(value) => { setForm((prev) => ({ ...prev, currency: value })); setCurrency(value); }} />
+            <SelectField icon={Target} label="Currency" value={form.currency} disabled={!editing || saving} options={currencyOptions} onChange={(value) => setForm((prev) => ({ ...prev, currency: value }))} />
             <Field icon={ImagePlus} label="Avatar image URL" value={form.avatarUrl} disabled={!editing || saving} onChange={(value) => setForm((prev) => ({ ...prev, avatarUrl: value }))} placeholder="Paste an image URL or upload above" />
           </div>
           {message && <p className="text-xs mt-4" style={{ color: '#86efac' }}>{message}</p>}
