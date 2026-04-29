@@ -1,0 +1,9 @@
+{
+  "appId": "com.hyder.HyTrack",
+  "appName": "HyTrack",
+  "webDir": "client/dist",
+  "server": {
+    "url": "https://hy-track.vercel.app/",
+    "cleartext": true
+  }
+}
